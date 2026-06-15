@@ -180,3 +180,134 @@ user_id | full_name     | email
 */
 
 
+-- -------------------------------------------------------------------------
+-- Query 3:
+-- Retrieve all booking records where the payment_status is missing (NULL),
+-- replacing the empty result with 'Action Required'.
+-- Concepts: IS NULL, COALESCE
+-- -------------------------------------------------------------------------
+SELECT
+    booking_id,
+    user_id,
+    match_id,
+    COALESCE(payment_status, 'Action Required') AS systematic_status
+FROM Bookings
+WHERE payment_status IS NULL;
+
+/*
+Expected Output:
+booking_id | user_id | match_id | systematic_status
+-----------+---------+----------+------------------
+504        | 2       | 101      | Action Required
+*/
+
+
+-- -------------------------------------------------------------------------
+-- Query 4:
+-- Retrieve match booking details along with the User's full name
+-- and the scheduled Match fixture teams.
+-- Concepts: INNER JOIN
+-- -------------------------------------------------------------------------
+SELECT
+    b.booking_id,
+    u.full_name,
+    m.fixture,
+    b.total_cost
+FROM Bookings b
+INNER JOIN Users   u ON b.user_id  = u.user_id
+INNER JOIN Matches m ON b.match_id = m.match_id
+ORDER BY b.booking_id;
+
+/*
+Expected Output:
+booking_id | full_name     | fixture                  | total_cost
+-----------+---------------+--------------------------+-----------
+501        | Tanvir Rahman | Real Madrid vs Barcelona | 150
+502        | Tanvir Rahman | Man City vs Liverpool    | 120
+503        | Asif Haque    | Real Madrid vs Barcelona | 150
+504        | Asif Haque    | Real Madrid vs Barcelona | 150
+505        | Sajjad Rahman | Man City vs Liverpool    | 120
+*/
+
+
+-- -------------------------------------------------------------------------
+-- Query 5:
+-- Display a comprehensive list of all users and their booking IDs,
+-- ensuring fans who have never bought a ticket are still listed.
+-- Concepts: LEFT JOIN
+-- -------------------------------------------------------------------------
+SELECT
+    u.user_id,
+    u.full_name,
+    b.booking_id
+FROM Users u
+LEFT JOIN Bookings b ON u.user_id = b.user_id
+ORDER BY u.user_id, b.booking_id;
+
+/*
+Expected Output:
+user_id | full_name     | booking_id
+--------+---------------+-----------
+1       | Tanvir Rahman | 501
+1       | Tanvir Rahman | 502
+2       | Asif Haque    | 503
+2       | Asif Haque    | 504
+3       | Sajjad Rahman | 505
+4       | Jannat Ara    | NULL
+*/
+
+
+-- -------------------------------------------------------------------------
+-- Query 6:
+-- Find all ticket bookings where the total cost is strictly higher
+-- than the average cost of all ticket bookings.
+-- Concepts: Subquery, AVG aggregate
+-- -------------------------------------------------------------------------
+SELECT
+    booking_id,
+    match_id,
+    total_cost
+FROM Bookings
+WHERE total_cost > (
+    SELECT AVG(total_cost)
+    FROM Bookings
+)
+ORDER BY booking_id;
+
+/*
+AVG of all bookings = (150 + 120 + 150 + 150 + 120) / 5 = 138.00
+
+Expected Output:
+booking_id | match_id | total_cost
+-----------+----------+-----------
+501        | 101      | 150
+503        | 101      | 150
+504        | 101      | 150
+*/
+
+
+-- -------------------------------------------------------------------------
+-- Query 7:
+-- Retrieve the top 2 most expensive matches sorted by base ticket price,
+-- skipping the absolute highest premium match.
+-- (Skips Real Madrid vs Barcelona at 150)
+-- Concepts: ORDER BY, LIMIT, OFFSET
+-- -------------------------------------------------------------------------
+SELECT
+    match_id,
+    fixture,
+    base_ticket_price
+FROM Matches
+ORDER BY base_ticket_price DESC
+LIMIT 2 OFFSET 1;
+
+/*
+Sorted order: 150 → 130 → 120 → 90 → 80
+OFFSET 1 skips the first row (150), LIMIT 2 takes the next two (130, 120).
+
+Expected Output:
+match_id | fixture              | base_ticket_price
+---------+----------------------+------------------
+103      | Bayern Munich vs PSG | 130
+102      | Man City vs Liverpool| 120
+*/
