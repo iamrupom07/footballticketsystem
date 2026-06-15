@@ -123,4 +123,60 @@ INSERT INTO Bookings (booking_id, user_id, match_id, seat_number, payment_status
 (504, 2, 101, NULL,   NULL,        150.00),
 (505, 3, 102, 'C-20', 'Pending',   120.00);
 
+-- =========================================================================
+-- PART 2: SQL QUERIES
+-- =========================================================================
+
+
+-- -------------------------------------------------------------------------
+-- Query 1:
+-- Retrieve all upcoming football matches belonging to the 'Champions League'
+-- where the match status is 'Available'.
+-- -------------------------------------------------------------------------
+SELECT
+    match_id,
+    fixture,
+    base_ticket_price
+FROM Matches
+WHERE tournament_category = 'Champions League'
+  AND match_status = 'Available';
+
+/*
+Expected Output:
+match_id | fixture                  | base_ticket_price
+---------+--------------------------+------------------
+101      | Real Madrid vs Barcelona | 150
+103      | Bayern Munich vs PSG     | 130
+*/
+
+
+-- -------------------------------------------------------------------------
+-- Query 2:
+-- Search for all users whose full names start with 'Tanvir'
+-- or contain the phrase 'Haque' (case-insensitive).
+-- Concepts: LIKE, ILIKE
+-- -------------------------------------------------------------------------
+-- PostgreSQL version (uses ILIKE for case-insensitive match):
+SELECT
+    user_id,
+    full_name,
+    email
+FROM Users
+WHERE full_name ILIKE 'Tanvir%'
+   OR full_name ILIKE '%Haque%';
+
+-- MySQL / SQL Server compatible alternative (LOWER + LIKE):
+-- SELECT user_id, full_name, email
+-- FROM Users
+-- WHERE LOWER(full_name) LIKE 'tanvir%'
+--    OR LOWER(full_name) LIKE '%haque%';
+
+/*
+Expected Output:
+user_id | full_name     | email
+--------+---------------+----------------
+1       | Tanvir Rahman | tanvir@mail.com
+2       | Asif Haque    | asif@mail.com
+*/
+
 
