@@ -101,4 +101,18 @@ This project targets **PostgreSQL**. To set up the database locally:
 ---
 
 
+## 🛠️ Constraints & Design Decisions
+
+- `CHECK` constraints enforce valid values for `role`, `match_status`, and `payment_status`
+- `UNIQUE` constraint on `email` prevents duplicate user accounts
+- `ON DELETE CASCADE` on foreign keys ensures booking records are removed if a user or match is deleted
+- `phone_number`, `seat_number`, and `payment_status` are intentionally nullable to reflect real-world incomplete data scenarios
+
+---
+
+## 👤 Author
+
+**MD. Sidur Rahaman Rupom**  
+Database Design Assignment — Football Ticket Booking System
+
 
